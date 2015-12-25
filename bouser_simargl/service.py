@@ -53,7 +53,7 @@ class Simargl(MultiService, BouserPlugin):
             return
         message.hops.append(self.uuid.hex)
         for recipient in self.clients.itervalues():
-            recipient.send(message)
+            log.callWithContext({'subsystem': 'Simargl:Client:%s' % recipient.fq_name}, recipient.send, message)
 
     def inject_message(self, message):
         return self.message_received(None, message)

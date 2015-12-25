@@ -22,19 +22,25 @@ class SimarglClient(Service):
 
     def _fob(self, simargl):
         self.simargl = simargl
+        log.msg(self.fq_name, system="Bootstrap:Simargl")
+        if self.signal_name:
+            blinker.signal(self.signal_name + ':boot').send(self)
+
+    @property
+    def module_name(self):
         module_name = self.__module__
         if module_name.startswith('bouser_simargl.'):
             module_name = module_name[15:]
         elif module_name.startswith('bouser_'):
             module_name = u'bouser.ext.%s' % module_name[7:]
-        name = u'%s :: %s' % (module_name, self.name)
-        if self.signal_name:
-            msg = "%s (%s)" % (name, self.signal_name)
-        else:
-            msg = "%s" % (name,)
-        log.msg(msg, system="Bootstrap:Simargl")
-        if self.signal_name:
-            blinker.signal(self.signal_name + ':boot').send(self)
+        return module_name
+
+    @property
+    def fq_name(self):
+        name = u'%s :: %s' % (self.module_name, self.name)
+        if not self.signal_name:
+            return name
+        return "%s (%s)" % (name, self.signal_name)
 
     def __init__(self, config):
         self.config = config
