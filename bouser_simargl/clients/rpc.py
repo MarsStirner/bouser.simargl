@@ -41,7 +41,7 @@ class Client(SimarglClient, Resource):
             data = json.loads(content, 'utf-8')
         else:
             request.setResponseCode(400, 'Unknown Content Type')
-            defer.returnValue('')
+            return ''
 
         message = Message.from_json(data)
 
