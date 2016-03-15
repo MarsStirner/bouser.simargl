@@ -22,9 +22,12 @@ class Simargl(MultiService, BouserPlugin):
         MultiService.__init__(self)
         self.uuid = uuid.uuid4()
         self.clients = {}
-        with open(config['config'], 'rt') as fp:
-            parsed_config = ConfigParser.ConfigParser()
-            parsed_config.readfp(fp)
+        if isinstance(config['config'], basestring):
+            with open(config['config'], 'rt') as fp:
+                parsed_config = ConfigParser.ConfigParser()
+                parsed_config.readfp(fp)
+        else:
+            parsed_config = config['config']
 
         for name in parsed_config.sections():
             mod_name = parsed_config.get(name, 'module')
