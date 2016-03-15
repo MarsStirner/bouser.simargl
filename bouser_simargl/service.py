@@ -26,16 +26,22 @@ class Simargl(MultiService, BouserPlugin):
             with open(config['config'], 'rt') as fp:
                 parsed_config = ConfigParser.ConfigParser()
                 parsed_config.readfp(fp)
+            for name in parsed_config.sections():
+                mod_name = parsed_config.get(name, 'module')
+                module = __import__(mod_name, globals(), locals(), fromlist=['Client'])
+                client = getattr(module, 'Client')(dict(parsed_config.items(name)))
+                client.setName(name)
+                client.setServiceParent(self)
+                self.clients[name] = client
         else:
             parsed_config = config['config']
-
-        for name in parsed_config.sections():
-            mod_name = parsed_config.get(name, 'module')
-            module = __import__(mod_name, globals(), locals(), fromlist=['Client'])
-            client = getattr(module, 'Client')(dict(parsed_config.items(name)))
-            client.setName(name)
-            client.setServiceParent(self)
-            self.clients[name] = client
+            for name in parsed_config:
+                mod_name = parsed_config[name]['module']
+                module = __import__(mod_name, globals(), locals(), fromlist=['Client'])
+                client = getattr(module, 'Client')(parsed_config[name])
+                client.setName(name)
+                client.setServiceParent(self)
+                self.clients[name] = client
 
     def message_received(self, client, message):
         """
