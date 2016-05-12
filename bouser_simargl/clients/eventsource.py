@@ -61,7 +61,7 @@ class Client(SimarglClient, Resource):
         else:
             request.user = user_id
             request.setHeader('Content-Type', 'text/event-stream; charset=utf-8')
-            request.write(': connection established')
+            request.write(': connection established\n\n')
             self.requests.add(request)
             request.notifyFinish().addBoth(onFinish)
             log.msg("Connection from %s established" % request.getClientIP(), system="Event Source")
